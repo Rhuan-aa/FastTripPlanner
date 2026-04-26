@@ -33,7 +33,6 @@ import br.edu.ifsp.scl.sc3043983.fasttripplanner.ui.theme.FastTripPlannerTheme
 class TripDataActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             FastTripPlannerTheme {
                 Surface {
@@ -101,7 +100,11 @@ fun DataFields() {
         Button(
             onClick = {
                 if (!validateInformation(destiny, numberOfDays, budget)){
-                    Toast.makeText(context, "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Preencha todos os campos!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
 
                 }
