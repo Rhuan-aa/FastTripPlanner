@@ -174,19 +174,22 @@ fun BottomButtons(
             Text("Voltar")
         }
 
-        Button(onClick = {
-            val intent = Intent(
-                context,
-                TripResumeActivity::class.java
-            ).apply {
-                putExtra("DESTINY", destiny)
-                putExtra("DAYS", numberOfDays)
-                putExtra("BUDGET", budget)
-                putExtra("HOSTING", selectedHosting.toString())
-                putExtra("SERVICES", selectedServices.toString())
-            }
-            context?.startActivity(intent)
-        }) {
+        Button(
+            onClick = {
+                val servicesText = if (selectedServices.isEmpty()) "Nenhum"
+                else selectedServices.joinToString(", ") { it.toString() }
+
+                val intent = Intent(context, TripResumeActivity::class.java).apply {
+                    putExtra("DESTINY", destiny)
+                    putExtra("DAYS", numberOfDays)
+                    putExtra("BUDGET", budget)
+                    putExtra("HOSTING", selectedHosting.toString())
+                    putExtra("SERVICES", servicesText)
+                }
+                context?.startActivity(intent)
+            },
+            shape = RoundedCornerShape(32.dp)
+        ) {
             Text("Calcular")
         }
     }
