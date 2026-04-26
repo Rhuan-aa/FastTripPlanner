@@ -1,5 +1,6 @@
 package br.edu.ifsp.scl.sc3043983.fasttripplanner
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -106,9 +107,18 @@ fun DataFields() {
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-
+                    val intent = Intent(
+                        context,
+                        TripOptionsActivity::class.java
+                    ).apply {
+                        putExtra("DESTINY", destiny)
+                        putExtra("DAYS", numberOfDays.toIntOrNull() ?: 0)
+                        putExtra("BUDGET", budget.toDoubleOrNull() ?: 0.0)
+                    }
+                    context.startActivity(intent)
                 }
-            }
+            },
+            shape = RoundedCornerShape(32.dp),
         ) {
             Text("Avançar")
         }
