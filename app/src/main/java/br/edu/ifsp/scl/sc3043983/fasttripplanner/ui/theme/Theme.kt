@@ -28,11 +28,10 @@ private val LightColorScheme = lightColorScheme(
     tertiary = TravelTertiary
 )
 
-// ui/theme/Theme.kt
 @Composable
 fun FastTripPlannerTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    darkTheme: Boolean = false,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
