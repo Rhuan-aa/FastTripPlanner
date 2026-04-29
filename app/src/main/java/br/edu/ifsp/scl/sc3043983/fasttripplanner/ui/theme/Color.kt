@@ -9,3 +9,6 @@ val TravelTertiary = Color(0xFF00ACC1)
 val TravelPrimaryDark = Color(0xFF1565C0)
 val TravelSecondaryDark = Color(0xFFFF8F00)
 val TravelTertiaryDark = Color(0xFF00838F)
+
+val SkyBlue = Color(0xFFE3F2FD) // Azul muito clarinho para o container
+val DeepOcean = Color(0xFF1976D2) // Azul forte para botões
