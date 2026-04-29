@@ -5,20 +5,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Luggage // Ícone de mala
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,17 +42,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.edu.ifsp.scl.sc3043983.fasttripplanner.model.HostingType
 import br.edu.ifsp.scl.sc3043983.fasttripplanner.model.ServiceType
 import br.edu.ifsp.scl.sc3043983.fasttripplanner.ui.theme.FastTripPlannerTheme
-import kotlin.collections.plus
-import kotlin.text.toDoubleOrNull
-import kotlin.text.toIntOrNull
 
 class TripOptionsActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val destiny = intent.getStringExtra("DESTINY") ?: "Não informado"
@@ -47,12 +57,9 @@ class TripOptionsActivity : ComponentActivity() {
         val budget = intent.getDoubleExtra("BUDGET", 0.0)
         setContent {
             FastTripPlannerTheme {
-                Surface {
-                    OptionsSection(
-                        destiny,
-                        numberOfDays,
-                        budget
-                    )
+                // 💡 Surface transparente para o gradiente do Theme aparecer!
+                Surface(color = Color.Transparent) {
+                    OptionsSection(destiny, numberOfDays, budget)
                 }
             }
         }
@@ -66,24 +73,58 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
     var selectedServices by remember { mutableStateOf(setOf<ServiceType>()) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Icon(
+            imageVector = Icons.Default.Luggage,
+            contentDescription = "Ícone de bagagem",
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
         Text(
-            "Viagem para: $destiny",
-            style = MaterialTheme.typography.headlineSmall
+            text = "Personalizar",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = "Destino: $destiny",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        DropdownMenuComponent(
-            selectedHosting = selectedHosting,
-            onHostingSelected = { selectedHosting = it }
-        )
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                DropdownMenuComponent(
+                    selectedHosting = selectedHosting,
+                    onHostingSelected = { selectedHosting = it }
+                )
 
-        CheckServicesComponent(
-            selectedServices = selectedServices,
-            onServicesChanged = { selectedServices = it }
-        )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Linha divisória
+
+                CheckServicesComponent(
+                    selectedServices = selectedServices,
+                    onServicesChanged = { selectedServices = it }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         BottomButtons(
             context = context,
@@ -114,8 +155,10 @@ fun DropdownMenuComponent(
             readOnly = true,
             label = { Text("Tipo de Hospedagem") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
-            shape = RoundedCornerShape(24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            shape = RoundedCornerShape(16.dp)
         )
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -138,18 +181,36 @@ fun CheckServicesComponent(
     onServicesChanged: (Set<ServiceType>) -> Unit
 ) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Serviços Extras:", modifier = Modifier.padding(bottom = 8.dp))
+        Text(
+            text = "Serviços Extras:",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
         ServiceType.entries.forEach { service ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = selectedServices.contains(service),
-                    onCheckedChange = { isChecked ->
-                        val newSet = if (isChecked) selectedServices + service
-                        else selectedServices - service
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        val newSet = if (selectedServices.contains(service)) {
+                            selectedServices - service
+                        } else {
+                            selectedServices + service
+                        }
                         onServicesChanged(newSet)
                     }
+                    .padding(vertical = 4.dp)
+            ) {
+                Checkbox(
+                    checked = selectedServices.contains(service),
+                    onCheckedChange = null,
                 )
-                Text(text = service.toString())
+                Text(
+                    text = service.toString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -157,38 +218,44 @@ fun CheckServicesComponent(
 
 @Composable
 fun BottomButtons(
-    context : ComponentActivity?,
-    destiny : String,
-    numberOfDays : Int,
-    budget : Double,
+    context: ComponentActivity?,
+    destiny: String,
+    numberOfDays: Int,
+    budget: Double,
     selectedHosting: HostingType,
     selectedServices: Set<ServiceType>
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Button(onClick = {
-            context?.finish()
-        }) {
+        OutlinedButton(
+            onClick = { context?.finish() },
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
             Text("Voltar")
         }
 
         Button(
             onClick = {
-                val servicesText = if (selectedServices.isEmpty()) "Nenhum"
-                else selectedServices.joinToString(", ") { it.toString() }
-
                 val intent = Intent(context, TripResumeActivity::class.java).apply {
                     putExtra("DESTINY", destiny)
                     putExtra("DAYS", numberOfDays)
                     putExtra("BUDGET", budget)
-                    putExtra("HOSTING", selectedHosting.toString())
+                    putExtra("HOSTING", selectedHosting.name)
+
+                    val servicesText = selectedServices.joinToString(",") { it.name }
                     putExtra("SERVICES", servicesText)
                 }
                 context?.startActivity(intent)
             },
-            shape = RoundedCornerShape(32.dp)
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
         ) {
             Text("Calcular")
         }
