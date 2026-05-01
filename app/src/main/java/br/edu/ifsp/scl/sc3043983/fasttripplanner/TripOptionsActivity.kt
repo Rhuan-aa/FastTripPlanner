@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +58,6 @@ class TripOptionsActivity : ComponentActivity() {
         val budget = intent.getDoubleExtra("BUDGET", 0.0)
         setContent {
             FastTripPlannerTheme {
-                // 💡 Surface transparente para o gradiente do Theme aparecer!
                 Surface(color = Color.Transparent) {
                     OptionsSection(destiny, numberOfDays, budget)
                 }
@@ -69,8 +69,8 @@ class TripOptionsActivity : ComponentActivity() {
 @Composable
 fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
     val context = LocalActivity.current as? ComponentActivity
-    var selectedHosting by remember { mutableStateOf(HostingType.ECONOMIC) }
-    var selectedServices by remember { mutableStateOf(setOf<ServiceType>()) }
+    var selectedHosting by rememberSaveable { mutableStateOf(HostingType.ECONOMIC) }
+    var selectedServices by rememberSaveable { mutableStateOf(setOf<ServiceType>()) }
 
     Column(
         modifier = Modifier
@@ -115,7 +115,7 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
                     onHostingSelected = { selectedHosting = it }
                 )
 
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Linha divisória
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 CheckServicesComponent(
                     selectedServices = selectedServices,

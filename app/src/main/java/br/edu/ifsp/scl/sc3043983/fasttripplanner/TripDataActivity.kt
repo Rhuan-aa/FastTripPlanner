@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,9 +107,9 @@ fun DataFields() {
                     modifier = Modifier.padding(bottom = 32.dp)
                 )
 
-                var destiny by remember { mutableStateOf("") }
-                var numberOfDays by remember { mutableStateOf("") }
-                var budget by remember { mutableStateOf("") }
+                var destiny by rememberSaveable { mutableStateOf("") }
+                var numberOfDays by rememberSaveable { mutableStateOf("") }
+                var budget by rememberSaveable { mutableStateOf("") }
 
                 Column(
                     Modifier

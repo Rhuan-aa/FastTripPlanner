@@ -168,7 +168,7 @@ fun TripReport(
 
                 val finalCost = calculateCost(numberOfDays, budget, selectedHosting, selectedServices)
                 OutlinedTextField(
-                    value = "R$ $finalCost", onValueChange = {}, readOnly = true,
+                    value = "R$ " + "%.2f".format(finalCost), onValueChange = {}, readOnly = true,
                     label = { Text("Custo Total Estimado", fontWeight = FontWeight.Bold) },
                     modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
                 )
