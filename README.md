@@ -63,6 +63,10 @@ $$Custo Total = (Orçamento Diário \times Dias \times Multiplicador da Hospedag
 4.  Selecione um emulador (API 26+) ou dispositivo físico conectado.
 5.  Clique em **Run** (`Shift + F10`).
 
+## Vídeo de exemplo 
+   ```bash
+   https://youtube.com/shorts/oE71JvUejrQ?feature=share
+   ```
 ---
 **Desenvolvido por:** Rhuan
 
