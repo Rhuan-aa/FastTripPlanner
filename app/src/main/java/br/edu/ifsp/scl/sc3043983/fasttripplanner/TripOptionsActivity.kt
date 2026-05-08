@@ -72,7 +72,7 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
     val context = LocalActivity.current as? ComponentActivity
     var selectedHosting by rememberSaveable { mutableStateOf(HostingType.ECONOMIC) }
     var selectedServices by rememberSaveable { mutableStateOf(setOf<ServiceType>()) }
-    var economicMode = true
+    var economicMode by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -131,7 +131,10 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
                     Row (Modifier.fillMaxWidth()) {
                         Checkbox(
                             checked = economicMode,
-                            onCheckedChange = {economicMode = !economicMode},
+                            onCheckedChange = {
+                                economicMode = !economicMode
+                                selectedServices = setOf()
+                                              },
                         )
                         Text(
                             text = "Modo Econômico",
@@ -231,6 +234,7 @@ fun CheckServicesComponent(
                 Checkbox(
                     checked = selectedServices.contains(service),
                     onCheckedChange = null,
+                    enabled = !economicMode
                 )
                 Text(
                     text = service.toString(),
