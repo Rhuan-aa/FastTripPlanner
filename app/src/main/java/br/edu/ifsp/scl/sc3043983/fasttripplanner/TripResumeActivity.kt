@@ -63,6 +63,8 @@ class TripResumeActivity : ComponentActivity() {
             emptySet()
         }
 
+        val economicMode = intent.getBooleanExtra("ECONOMIC_MODE", false)
+
         setContent {
             FastTripPlannerTheme {
                 Surface(color = Color.Transparent) {
@@ -72,7 +74,8 @@ class TripResumeActivity : ComponentActivity() {
                         numberOfDays = numberOfDays,
                         budget = budget,
                         selectedHosting = selectedHosting,
-                        selectedServices = selectedServices
+                        selectedServices = selectedServices,
+                        economicMode
                     )
                 }
             }
@@ -84,12 +87,13 @@ fun calculateCost(
     numberOfDays: Int,
     budget: Double,
     selectedHosting: HostingType,
-    selectedServices: Set<ServiceType>
+    selectedServices: Set<ServiceType>,
+    economicMode : Boolean
 ): Double {
     var totalCost = budget * numberOfDays
     totalCost *= selectedHosting.modifier
     totalCost += selectedServices.sumOf { it.price }
-    return totalCost
+    return if (economicMode) totalCost*0.85 else totalCost;
 }
 
 @Composable
@@ -99,7 +103,8 @@ fun TripReport(
     numberOfDays: Int,
     budget: Double,
     selectedHosting: HostingType,
-    selectedServices: Set<ServiceType>
+    selectedServices: Set<ServiceType>,
+    economicMode: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -166,7 +171,7 @@ fun TripReport(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                val finalCost = calculateCost(numberOfDays, budget, selectedHosting, selectedServices)
+                val finalCost = calculateCost(numberOfDays, budget, selectedHosting, selectedServices, economicMode)
                 OutlinedTextField(
                     value = "R$ " + "%.2f".format(finalCost), onValueChange = {}, readOnly = true,
                     label = { Text("Custo Total Estimado", fontWeight = FontWeight.Bold) },
@@ -206,7 +211,8 @@ fun PreviewTripReport() {
                 numberOfDays = 7,
                 budget = 450.0,
                 selectedHosting = HostingType.ECONOMIC,
-                selectedServices = emptySet()
+                selectedServices = emptySet(),
+                economicMode = false
             )
         }
     }

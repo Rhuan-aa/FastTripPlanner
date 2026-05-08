@@ -1,5 +1,6 @@
 package br.edu.ifsp.scl.sc3043983.fasttripplanner
 
+import android.R.attr.checked
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -71,6 +72,7 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
     val context = LocalActivity.current as? ComponentActivity
     var selectedHosting by rememberSaveable { mutableStateOf(HostingType.ECONOMIC) }
     var selectedServices by rememberSaveable { mutableStateOf(setOf<ServiceType>()) }
+    var economicMode = true
 
     Column(
         modifier = Modifier
@@ -112,15 +114,32 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
             ) {
                 DropdownMenuComponent(
                     selectedHosting = selectedHosting,
-                    onHostingSelected = { selectedHosting = it }
+                    onHostingSelected = { selectedHosting = it },
+                    economicMode = economicMode
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 CheckServicesComponent(
                     selectedServices = selectedServices,
-                    onServicesChanged = { selectedServices = it }
+                    onServicesChanged = { selectedServices = it },
+                    economicMode = economicMode
                 )
+
+                Column (Modifier.fillMaxWidth()) {
+                    Text(text = "Modos de Cálculo")
+                    Row (Modifier.fillMaxWidth()) {
+                        Checkbox(
+                            checked = economicMode,
+                            onCheckedChange = {economicMode = !economicMode},
+                        )
+                        Text(
+                            text = "Modo Econômico",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
             }
         }
 
@@ -132,7 +151,8 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
             numberOfDays = numberOfDays,
             budget = budget,
             selectedHosting = selectedHosting,
-            selectedServices = selectedServices
+            selectedServices = selectedServices,
+            economicMode = economicMode
         )
     }
 }
@@ -141,7 +161,8 @@ fun OptionsSection(destiny: String, numberOfDays: Int, budget: Double) {
 @Composable
 fun DropdownMenuComponent(
     selectedHosting: HostingType,
-    onHostingSelected: (HostingType) -> Unit
+    onHostingSelected: (HostingType) -> Unit,
+    economicMode: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -152,6 +173,7 @@ fun DropdownMenuComponent(
         OutlinedTextField(
             value = selectedHosting.toString(),
             onValueChange = {},
+            enabled = !economicMode,
             readOnly = true,
             label = { Text("Tipo de Hospedagem") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -166,8 +188,10 @@ fun DropdownMenuComponent(
                 DropdownMenuItem(
                     text = { Text(type.toString()) },
                     onClick = {
-                        onHostingSelected(type)
-                        expanded = false
+                        if (!economicMode){
+                            onHostingSelected(type)
+                            expanded = false
+                        }
                     }
                 )
             }
@@ -178,7 +202,8 @@ fun DropdownMenuComponent(
 @Composable
 fun CheckServicesComponent(
     selectedServices: Set<ServiceType>,
-    onServicesChanged: (Set<ServiceType>) -> Unit
+    onServicesChanged: (Set<ServiceType>) -> Unit,
+    economicMode: Boolean
 ) {
     Column(Modifier.fillMaxWidth()) {
         Text(
@@ -194,7 +219,7 @@ fun CheckServicesComponent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        val newSet = if (selectedServices.contains(service)) {
+                        val newSet = if (selectedServices.contains(service) || economicMode) {
                             selectedServices - service
                         } else {
                             selectedServices + service
@@ -214,6 +239,7 @@ fun CheckServicesComponent(
             }
         }
     }
+
 }
 
 @Composable
@@ -223,7 +249,8 @@ fun BottomButtons(
     numberOfDays: Int,
     budget: Double,
     selectedHosting: HostingType,
-    selectedServices: Set<ServiceType>
+    selectedServices: Set<ServiceType>,
+    economicMode: Boolean
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -245,10 +272,15 @@ fun BottomButtons(
                     putExtra("DESTINY", destiny)
                     putExtra("DAYS", numberOfDays)
                     putExtra("BUDGET", budget)
-                    putExtra("HOSTING", selectedHosting.name)
+                    if (economicMode) {
+                        putExtra("HOSTING", HostingType.ECONOMIC)
+                    } else {
+                        putExtra("HOSTING", selectedHosting.name)
+                    }
 
                     val servicesText = selectedServices.joinToString(",") { it.name }
                     putExtra("SERVICES", servicesText)
+                    putExtra("ECONOMIC_MODE", economicMode)
                 }
                 context?.startActivity(intent)
             },
